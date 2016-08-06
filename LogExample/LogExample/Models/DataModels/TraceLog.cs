@@ -68,21 +68,22 @@ namespace LogExample.Models.DataModels
                 action = "View";
             }
             string msgContent = string.Format(
-                @"{0},Url:{1},请求方式:{2},开始时间:{3}结束时间:{4}总时间:{5}秒,Cookie:{6},Header:{7},Ip:{8},操作详情:{9}",
+                @"{0},Url:{1},请求方式:{2},开始时间:{3}结束时间:{4}总时间:{5}秒,Cookie:{6},Header:{7},Ip:{8},操作详情:{9},响应:{10}",
                 actionView,
                 Url,
                 RequestMethod,
                 ExecuteStartTime,
                 ExecuteEndTime,
-                Watch.ElapsedMilliseconds, this.Cookie, Header, Ip, Operations.ToString());
+                Watch.ElapsedMilliseconds, this.Cookie, Header, Ip, Operations.ToString(), Response);
             if (!string.IsNullOrEmpty(Input))
             {
-                msgContent += @";输入参数：" + this.Input;
+                msgContent += @",输入参数：" + this.Input;
             }
             else if (!string.IsNullOrEmpty(Output))
             {
-                msgContent += @";输出参数：" + this.Output;
+                msgContent += @",输出参数：" + this.Output;
             }
+
             return msgContent;
         }
 

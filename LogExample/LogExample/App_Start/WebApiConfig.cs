@@ -108,7 +108,7 @@ namespace LogExample
             if (TraceLog != null)
             {
                 TraceLog.ExecuteEndTime = DateTime.Now;
-                TraceLog.Response = HttpContext.Current.Response.ToString();
+                //TraceLog.Response = HttpContext.Current.Response.ToString();
 
                 Task.Factory.StartNew(() =>
                 {

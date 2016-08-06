@@ -50,7 +50,7 @@ namespace LogExample.Controllers
             TraceLog.Header = filterContext.HttpContext.Request.Headers.ToString();
             TraceLog.Ip = filterContext.HttpContext.Request.GetIpAddr();
             TraceLog.RequestMethod = filterContext.HttpContext.Request.HttpMethod;
-            TraceLog.Input =CollectionHelper.GetCollections(filterContext.HttpContext.Request.Form) + CollectionHelper.GetCollections(filterContext.HttpContext.Request.QueryString); //获取参数
+            TraceLog.Input = CollectionHelper.GetCollections(filterContext.HttpContext.Request.Form) + CollectionHelper.GetCollections(filterContext.HttpContext.Request.QueryString); //获取参数
             base.OnActionExecuting(filterContext);
         }
 
@@ -63,7 +63,6 @@ namespace LogExample.Controllers
         {
             //TraceLog monLog = filterContext.Controller.ViewData["TraceLog"] as TraceLog;
             TraceLog.ExecuteEndTime = DateTime.Now;
-            TraceLog.Response = filterContext.HttpContext.Response.ToString();
 
             Task.Factory.StartNew(() =>
             {
@@ -111,6 +110,6 @@ namespace LogExample.Controllers
         #endregion
 
 
-    
+
     }
 }
