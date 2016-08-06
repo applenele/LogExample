@@ -1,16 +1,25 @@
-﻿using System;
+﻿using LogExample.Extensions;
+using LogExample.Schemas;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Web.Http;
 
 namespace LogExample.Controllers
 {
-    public class ProductController : ApiController
+    public class ProductController : ApiBaseController
     {
+        [RequireLog]
         public string GetTest()
         {
+            Operations.Append("Test");
+            Operations.Append("Test Finish");
+            Operations.AddToTraceLog(ActionContext);
+
+
             return "test";
         }
 
@@ -18,8 +27,6 @@ namespace LogExample.Controllers
 
         public string PostTest()
         {
-            int a = 0;
-            int b = 10 / a;
             return "ok";
         }
     }

@@ -1,12 +1,15 @@
 ﻿using LogExample.Extensions;
 using LogExample.Helper;
 using LogExample.Models;
+using LogExample.Models.DataModels;
 using LogExample.Schemas;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.Filters;
@@ -36,6 +39,8 @@ namespace LogExample
 
     public class ApiPermissionFilter : ActionFilterAttribute
     {
+
+        public User CurrentUser { set; get; }
         /// <summary>
         /// 2016-01-06 对API接口用户认证添加新的方式 目前支持两种
         /// 1：session认证
@@ -52,7 +57,7 @@ namespace LogExample
                 {
                     //得到用户登录的信息
                     //两种方式1.从Session获取
-                    User CurrentUser = HttpContext.Current.Session.GetCurrentUserInfo();
+                    CurrentUser = HttpContext.Current.Session.GetCurrentUserInfo();
                     if (CurrentUser == null)
                     {
                         //从请求头获取Authorization
@@ -72,12 +77,69 @@ namespace LogExample
                         actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.Unauthorized, new HttpError("logout"));
                     }
                 }
+
+                var TraceLog = new TraceLog();
+                ///开始记录追踪日志
+                TraceLog.ExecuteStartTime = Convert.ToDateTime(DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.ffff", DateTimeFormatInfo.InvariantInfo));
+                TraceLog.Url = actionContext.Request.RequestUri.AbsoluteUri;
+                TraceLog.Cookie = HttpContext.Current.Request.Cookies.ToDictString();
+                TraceLog.Header = actionContext.Request.Headers.ToString();
+                TraceLog.Ip = actionContext.Request.GetIpAddr();
+                TraceLog.RequestMethod = actionContext.Request.Method.Method;
+                TraceLog.Input = CollectionHelper.GetCollections(HttpContext.Current.Request.Form) + CollectionHelper.GetCollections(HttpContext.Current.Request.Form); //获取参数
+
+                actionContext.Request.Properties["TraceLog"] = TraceLog;
+
                 base.OnActionExecuting(actionContext);
             }
             catch (Exception ex)
             {
                 throw ex;
             }
+        }
+
+        /// <summary>
+        /// action 执行之后
+        /// </summary>
+        /// <param name="actionExecutedContext"></param>
+        public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
+        {
+            var TraceLog = actionExecutedContext.Request.Properties["TraceLog"] as TraceLog;
+            if (TraceLog != null)
+            {
+                TraceLog.ExecuteEndTime = DateTime.Now;
+                TraceLog.Response = HttpContext.Current.Response.ToString();
+
+                Task.Factory.StartNew(() =>
+                {
+                    LoggerHelper.Monitor(TraceLog.GetLogInfo());
+                });
+            }
+
+
+            ///保存操作日志到数据库
+            var attrs = actionExecutedContext.ActionContext.ActionDescriptor.GetCustomAttributes<RequireLogAttribute>();
+            var _attr = attrs.Where(a => a is RequireLogAttribute).FirstOrDefault();
+            if (_attr != null)
+            {
+                using (DB db = new DB())
+                {
+                    var log = new OperateLog()
+                    {
+                        CreatedDate = DateTime.Now,
+                        Description = TraceLog.Operations.ToString(),
+                        Ip = TraceLog.Ip,
+                        OperateType = _attr.OperateType,
+                        Url = HttpContext.Current.Request.Url.AbsoluteUri,
+                        UserId = CurrentUser == null ? 0 : CurrentUser.Id,
+                        UserName = CurrentUser == null ? "" : CurrentUser.UserName
+                    };
+                    db.OperateLogs.Add(log);
+                    db.SaveChanges();
+                }
+            }
+
+            base.OnActionExecuted(actionExecutedContext);
         }
     }
 

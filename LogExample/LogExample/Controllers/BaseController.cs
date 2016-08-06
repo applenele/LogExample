@@ -50,7 +50,7 @@ namespace LogExample.Controllers
             TraceLog.Header = filterContext.HttpContext.Request.Headers.ToString();
             TraceLog.Ip = filterContext.HttpContext.Request.GetIpAddr();
             TraceLog.RequestMethod = filterContext.HttpContext.Request.HttpMethod;
-            TraceLog.Input = GetCollections(filterContext.HttpContext.Request.Form) + GetCollections(filterContext.HttpContext.Request.QueryString); //获取参数
+            TraceLog.Input =CollectionHelper.GetCollections(filterContext.HttpContext.Request.Form) + CollectionHelper.GetCollections(filterContext.HttpContext.Request.QueryString); //获取参数
             base.OnActionExecuting(filterContext);
         }
 
@@ -111,25 +111,6 @@ namespace LogExample.Controllers
         #endregion
 
 
-        // <summary>
-        /// 获取Post 或Get 参数
-        /// </summary>
-        /// <param name="collections"></param>
-        /// <returns></returns>
-        public string GetCollections(NameValueCollection collections)
-        {
-            string parameters = string.Empty;
-            if (collections == null || collections.Count == 0)
-            {
-                return parameters;
-            }
-            parameters = collections.Keys.Cast<string>()
-                .Aggregate(parameters, (current, key) => current + string.Format("{0}={1}&", key, collections[key]));
-            if (!string.IsNullOrWhiteSpace(parameters) && parameters.EndsWith("&"))
-            {
-                parameters = parameters.Substring(0, parameters.Length - 1);
-            }
-            return parameters;
-        }
+    
     }
 }
