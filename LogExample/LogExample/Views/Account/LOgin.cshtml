@@ -1,0 +1,13 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+<form method="post">
+    @Html.AntiForgeryToken()
+    用户名：<input type="text" name="UserName" value="" />  <br />
+    密码：<input type="password" name="Password" value="" /> <br />
+    <input type="submit" value="登录" />
+</form>
+
