@@ -117,7 +117,8 @@ namespace LogExample
             }
 
 
-            ///保存操作日志到数据库
+            ///保存操作日志到数据库  在这里也可以可以获取ActionName 和ControllerName  
+           // var actionName = actionExecutedContext.ActionContext.ActionDescriptor.ActionName;
             var attrs = actionExecutedContext.ActionContext.ActionDescriptor.GetCustomAttributes<RequireLogAttribute>();
             var _attr = attrs.Where(a => a is RequireLogAttribute).FirstOrDefault();
             if (_attr != null)
