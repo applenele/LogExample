@@ -1,0 +1,2 @@
+# LogExample
+How to log
