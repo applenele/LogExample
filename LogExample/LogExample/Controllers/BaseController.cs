@@ -5,6 +5,7 @@ using LogExample.Models.DataModels;
 using LogExample.Schemas;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,7 +28,10 @@ namespace LogExample.Controllers
             base.Initialize(requestContext);
         }
 
-
+        /// <summary>
+        /// Action 之前执行
+        /// </summary>
+        /// <param name="filterContext"></param>
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             CurrentUser = filterContext.HttpContext.Session.GetCurrentUserInfo();
@@ -39,24 +43,26 @@ namespace LogExample.Controllers
                     filterContext.Result = RedirectToRoute("Default", new { controller = "Account", action = "Login" });
             }
 
+            ///开始记录追踪日志
             TraceLog.ExecuteStartTime = Convert.ToDateTime(DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.ffff", DateTimeFormatInfo.InvariantInfo));
-            TraceLog.ControllerName = filterContext.RouteData.Values["controller"] as string;
-            TraceLog.ActionName = filterContext.RouteData.Values["action"] as string;
+            TraceLog.Url = filterContext.HttpContext.Request.Url.AbsoluteUri;
             TraceLog.Cookie = filterContext.HttpContext.Request.Cookies.ToDictString();
             TraceLog.Header = filterContext.HttpContext.Request.Headers.ToString();
             TraceLog.Ip = filterContext.HttpContext.Request.GetIpAddr();
-
+            TraceLog.RequestMethod = filterContext.HttpContext.Request.HttpMethod;
+            TraceLog.Input = GetCollections(filterContext.HttpContext.Request.Form) + GetCollections(filterContext.HttpContext.Request.QueryString); //获取参数
             base.OnActionExecuting(filterContext);
         }
 
 
-
+        /// <summary>
+        /// Action 执行完成之后
+        /// </summary>
+        /// <param name="filterContext"></param>
         protected override void OnActionExecuted(ActionExecutedContext filterContext)
         {
             //TraceLog monLog = filterContext.Controller.ViewData["TraceLog"] as TraceLog;
             TraceLog.ExecuteEndTime = DateTime.Now;
-            TraceLog.FormCollections = filterContext.HttpContext.Request.Form;//form表单提交的数据
-            TraceLog.QueryCollections = filterContext.HttpContext.Request.QueryString;//Url 参数
             TraceLog.Response = filterContext.HttpContext.Response.ToString();
 
             Task.Factory.StartNew(() =>
@@ -92,5 +98,38 @@ namespace LogExample.Controllers
 
 
 
+        #region View 视图生成时间监控 可以记录生成的日志追踪 
+        protected override void OnResultExecuting(ResultExecutingContext filterContext)
+        {
+            base.OnResultExecuting(filterContext);
+        }
+
+        protected override void OnResultExecuted(ResultExecutedContext filterContext)
+        {
+            base.OnResultExecuted(filterContext);
+        }
+        #endregion
+
+
+        // <summary>
+        /// 获取Post 或Get 参数
+        /// </summary>
+        /// <param name="collections"></param>
+        /// <returns></returns>
+        public string GetCollections(NameValueCollection collections)
+        {
+            string parameters = string.Empty;
+            if (collections == null || collections.Count == 0)
+            {
+                return parameters;
+            }
+            parameters = collections.Keys.Cast<string>()
+                .Aggregate(parameters, (current, key) => current + string.Format("{0}={1}&", key, collections[key]));
+            if (!string.IsNullOrWhiteSpace(parameters) && parameters.EndsWith("&"))
+            {
+                parameters = parameters.Substring(0, parameters.Length - 1);
+            }
+            return parameters;
+        }
     }
 }

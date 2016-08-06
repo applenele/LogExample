@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LogExample.Models.Enum;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -17,26 +18,7 @@ namespace LogExample.Models.DataModels
             this.Operations = new StringBuilder();
         }
 
-        /// <summary>
-        /// 监控类型
-        /// </summary>
-        public enum MonitorType
-        {
-            /// <summary>
-            /// Action
-            /// </summary>
-            Action = 1,
-
-            /// <summary>
-            /// 视图
-            /// </summary>
-            View = 2
-        }
-
-
-        public string ControllerName { get; set; }
-
-        public string ActionName { get; set; }
+        public string Url { get; set; }
 
         public Stopwatch Watch { get; set; }
 
@@ -52,84 +34,60 @@ namespace LogExample.Models.DataModels
 
         public StringBuilder Operations { set; get; }
 
+        /// <summary>
+        /// 请求方式
+        /// </summary>
+        public string RequestMethod { set; get; }
+
         public string Ip { set; get; }
 
         /// <summary>
-        /// Form 表单数据
+        /// 输入的参数
         /// </summary>
-        public NameValueCollection FormCollections { get; set; }
+        public string Input { set; get; }
 
         /// <summary>
-        /// URL 参数
+        /// 返回
         /// </summary>
-        public NameValueCollection QueryCollections { get; set; }
+        public string Output { set; get; }
 
-        /// <summary>
-        /// 文本流
-        /// </summary>
-        public string Raw { get; set; }
 
         /// <summary>
         /// 获取监控指标日志
         /// </summary>
         /// <param name="mtype"></param>
         /// <returns></returns>
-        public string GetLogInfo(MonitorType mtype = MonitorType.Action)
+        public string GetLogInfo(TraceType mtype = TraceType.Action)
         {
             this.Watch.Stop();
             string actionView = "Action执行时间监控：";
             string action = "Action";
-            if (mtype == MonitorType.View)
+            if (mtype == TraceType.View)
             {
                 actionView = "View视图生成时间监控：";
                 action = "View";
             }
             string msgContent = string.Format(
-                @"{0}ControllerName：{1}Controller{2}Name:{3}开始时间：{4}结束时间：{5}总时间：{6}秒,Cookie:{7},Header:{8},Ip:{9},操作详情:{10}",
+                @"{0},Url:{1},请求方式:{2},开始时间:{3}结束时间:{4}总时间:{5}秒,Cookie:{6},Header:{7},Ip:{8},操作详情:{9}",
                 actionView,
-                this.ControllerName,
-                action,
-                this.ActionName,
-                this.ExecuteStartTime,
-                this.ExecuteEndTime,
-                this.Watch.ElapsedMilliseconds, this.Cookie, Header,Ip, Operations.ToString());
-
-            if (!string.IsNullOrEmpty(this.Raw))
+                Url,
+                RequestMethod,
+                ExecuteStartTime,
+                ExecuteEndTime,
+                Watch.ElapsedMilliseconds, this.Cookie, Header, Ip, Operations.ToString());
+            if (!string.IsNullOrEmpty(Input))
             {
-                msgContent += @"Raw：" + this.Raw;
+                msgContent += @";输入参数：" + this.Input;
             }
-            else if (this.FormCollections != null)
+            else if (!string.IsNullOrEmpty(Output))
             {
-                msgContent += @"Form：" + this.GetCollections(this.FormCollections);
-            }
-            else if (this.QueryCollections != null)
-            {
-                msgContent += @"Query：" + this.GetCollections(this.QueryCollections);
+                msgContent += @";输出参数：" + this.Output;
             }
             return msgContent;
         }
 
 
-        // <summary>
-        /// 获取Post 或Get 参数
-        /// </summary>
-        /// <param name="collections"></param>
-        /// <returns></returns>
-        public string GetCollections(NameValueCollection collections)
-        {
-            string parameters = string.Empty;
-            if (collections == null || collections.Count == 0)
-            {
-                return parameters;
-            }
-            parameters = collections.Keys.Cast<string>()
-                .Aggregate(parameters, (current, key) => current + string.Format("{0}={1}&", key, collections[key]));
-            if (!string.IsNullOrWhiteSpace(parameters) && parameters.EndsWith("&"))
-            {
-                parameters = parameters.Substring(0, parameters.Length - 1);
-            }
-            return parameters;
-        }
+
     }
 
 }

@@ -180,6 +180,7 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\DataModels\TraceLog.cs" />
     <Compile Include="Models\DB.cs" />
+    <Compile Include="Models\Enum\TraceType.cs" />
     <Compile Include="Models\OperateLog.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
