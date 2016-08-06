@@ -46,8 +46,8 @@ namespace LogExample.Controllers
             ///开始记录追踪日志
             TraceLog.ExecuteStartTime = Convert.ToDateTime(DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.ffff", DateTimeFormatInfo.InvariantInfo));
             TraceLog.Url = filterContext.HttpContext.Request.Url.AbsoluteUri;
-            TraceLog.Cookie = filterContext.HttpContext.Request.Cookies.ToDictString();
-            TraceLog.Header = filterContext.HttpContext.Request.Headers.ToString();
+            TraceLog.Cookie = HttpUtility.UrlDecode(filterContext.HttpContext.Request.Cookies.ToDictString());
+            TraceLog.Header = HttpUtility.UrlDecode(filterContext.HttpContext.Request.Headers.ToString());
             TraceLog.Ip = filterContext.HttpContext.Request.GetIpAddr();
             TraceLog.RequestMethod = filterContext.HttpContext.Request.HttpMethod;
             TraceLog.Input = CollectionHelper.GetCollections(filterContext.HttpContext.Request.Form) + CollectionHelper.GetCollections(filterContext.HttpContext.Request.QueryString); //获取参数

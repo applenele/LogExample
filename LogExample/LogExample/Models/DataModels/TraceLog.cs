@@ -68,7 +68,7 @@ namespace LogExample.Models.DataModels
                 action = "View";
             }
             string msgContent = string.Format(
-                @"{0},Url:{1},请求方式:{2},开始时间:{3}结束时间:{4}总时间:{5}秒,Cookie:{6},Header:{7},Ip:{8},操作详情:{9},响应:{10}",
+                @"{0},Url:{1},请求方式:{2},开始时间:{3},结束时间:{4},总时间:{5}秒,Cookie:{6},Header:{7},Ip:{8},操作详情:{9},响应:{10}",
                 actionView,
                 Url,
                 RequestMethod,
