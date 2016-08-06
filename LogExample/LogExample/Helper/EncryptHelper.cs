@@ -13,7 +13,7 @@ namespace LogExample.Helper
         /// <summary>
         /// 密钥
         /// </summary>
-        public static readonly string _Key = "itdoscom";
+        public static readonly string _Key = "smallcode";
         /// <summary>
         /// DES加密字符串
         /// </summary>

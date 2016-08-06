@@ -19,6 +19,17 @@ namespace LogExample
             RouteConfig.RegisterRoutes(RouteTable.Routes);
 
             log4net.Config.XmlConfigurator.Configure();
+
+           
+        }
+
+        /// <summary>
+        /// 在webapi中启用 session
+        /// </summary>
+        public override void Init()
+        {
+            this.PostAuthenticateRequest += (sender, e) => HttpContext.Current.SetSessionStateBehavior(System.Web.SessionState.SessionStateBehavior.Required);
+            base.Init();
         }
     }
 }

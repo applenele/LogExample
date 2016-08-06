@@ -94,7 +94,6 @@
 </head>
 <body>
     <div class="center">
-        <img id="img_error" src="/Images/500.png" height="218" width="640">
         <div class="center_link">
             <a href="/Home">返回首页</a><a href="javascript:void(0)" id="link_expand">
                 @if (@Model.ShowException)
@@ -117,7 +116,6 @@
         <tr>
             <td colspan="2" class="td-remark">
                 异常相关信息
-                <button style="float:right;font-weight:normal;" id="btn_screen">截图报告管理员</button>
             </td>
         </tr>
         <tr>
@@ -170,10 +168,6 @@
         <tr>
             <td class="td-title">ip</td>
             <td class="td-code">@Model.RequestIp</td>
-        </tr>
-        <tr>
-            <td class="td-title">请求参数</td>
-            <td class="td-code">@Model.Input</td>
         </tr>
         <tr>
             <td colspan="2" class="td-remark">服务器相关信息</td>
