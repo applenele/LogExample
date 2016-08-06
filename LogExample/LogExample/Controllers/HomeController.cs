@@ -18,5 +18,13 @@ namespace LogExample.Controllers
             TraceLog.Output = "true";
             return View();
         }
+
+
+        public ActionResult Test()
+        {
+            int a = 0;
+            int b = 10 / a;
+            return View();
+        }
     }
 }
