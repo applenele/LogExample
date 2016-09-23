@@ -1,4 +1,5 @@
 ﻿using LogExample.Models;
+using LogExample.Models.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace LogExample.Controllers
     public class DemoController : ApiController
     {
         [AllowAnonymous]
-        public string PostParam([FromBody] User model)
+        public string PostParam([FromBody] vUser model)
         {
             return model.UserName.Length.ToString();
         }

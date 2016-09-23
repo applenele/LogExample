@@ -15,6 +15,8 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Http.Filters;
 using System.Web.Http.Routing;
+using System.Web.Http.Controllers;
+using Newtonsoft.Json.Linq;
 
 namespace LogExample
 {
@@ -33,6 +35,7 @@ namespace LogExample
 
             config.Filters.Add(new ApiPermissionFilter());  //注册全局API Action过滤器
             config.Filters.Add(new ApiHandleErrorAttribute());  //注册全局异常过滤器
+            config.Filters.Add(new ModelStateFilterAttribute()); // model 实体验证
 
             //添加Trim去除空格 只会对json数据有用
             config.Formatters.JsonFormatter.SerializerSettings.Converters
@@ -229,4 +232,6 @@ namespace LogExample
                 writer.WriteValue(text.Trim());
         }
     }
+
+     
 }

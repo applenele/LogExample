@@ -4,12 +4,13 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
-namespace LogExample.Models
+namespace LogExample.Models.ViewModel
 {
-    public class User
+    public class vUser
     {
         public int Id { set; get; }
 
+        [Required]
         public string UserName { set; get; }
 
         public string Password { set; get; }
@@ -19,13 +20,5 @@ namespace LogExample.Models
         public string Phone { set; get; }
 
         public string Address { set; get; }
-
-        public Role Role { set; get; }
-    }
-
-    public enum Role
-    {
-        Admin,
-        Operator
     }
 }

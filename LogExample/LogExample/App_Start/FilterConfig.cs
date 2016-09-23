@@ -12,7 +12,9 @@ namespace LogExample
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
             filters.Add(new CustomErrorAttribute());
+            filters.Add(new ModelStateFilterAttribute());
             filters.Add(new HandleErrorAttribute());
+
         }
     }
 }
