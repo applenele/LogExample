@@ -189,6 +189,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ApiBaseController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\DemoController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ProductController.cs" />

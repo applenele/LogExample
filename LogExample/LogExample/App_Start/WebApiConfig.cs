@@ -3,6 +3,7 @@ using LogExample.Helper;
 using LogExample.Models;
 using LogExample.Models.DataModels;
 using LogExample.Schemas;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -32,6 +33,10 @@ namespace LogExample
 
             config.Filters.Add(new ApiPermissionFilter());  //注册全局API Action过滤器
             config.Filters.Add(new ApiHandleErrorAttribute());  //注册全局异常过滤器
+
+            //添加Trim去除空格 只会对json数据有用
+            config.Formatters.JsonFormatter.SerializerSettings.Converters
+             .Add(new TrimmingConverter());
         }
     }
 
@@ -192,6 +197,36 @@ namespace LogExample
                 }
             }
             return true;
+        }
+    }
+
+
+    /// <summary>
+    /// Triming 去掉空格 
+    /// </summary>
+    public class TrimmingConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(string);
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.String)
+                if (reader.Value != null)
+                    return (reader.Value as string).Trim();
+
+            return reader.Value;
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            var text = (string)value;
+            if (text == null)
+                writer.WriteNull();
+            else
+                writer.WriteValue(text.Trim());
         }
     }
 }

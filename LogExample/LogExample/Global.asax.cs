@@ -18,9 +18,12 @@ namespace LogExample
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
 
+
+            //加载log4net 配置
             log4net.Config.XmlConfigurator.Configure();
 
-           
+            //数据参数去掉空格
+            ModelBinders.Binders.Add(typeof(string), new StringTrimModelBinder());
         }
 
         /// <summary>
@@ -30,6 +33,19 @@ namespace LogExample
         {
             this.PostAuthenticateRequest += (sender, e) => HttpContext.Current.SetSessionStateBehavior(System.Web.SessionState.SessionStateBehavior.Required);
             base.Init();
+        }
+
+        /// <summary>
+        ///  数据参数字符串去掉空格
+        /// </summary>
+        public class StringTrimModelBinder : DefaultModelBinder
+        {
+            public override object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
+            {
+                var value = base.BindModel(controllerContext, bindingContext);
+                if (value is string) return (value as string).Trim();
+                return value;
+            }
         }
     }
 }

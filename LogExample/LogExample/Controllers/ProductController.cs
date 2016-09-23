@@ -24,6 +24,11 @@ namespace LogExample.Controllers
         }
 
 
+        public string GetParams(string name)
+        {
+            return name;
+        }
+
 
         public string PostTest()
         {
