@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LogExample.Helper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -19,8 +20,9 @@ namespace LogExample
             RouteConfig.RegisterRoutes(RouteTable.Routes);
 
 
+
             //加载log4net 配置
-            log4net.Config.XmlConfigurator.Configure();
+            LoggerHelper.SetConfig(new System.IO.FileInfo(Server.MapPath("~/log4net.config")));
 
             //数据参数去掉空格
             ModelBinders.Binders.Add(typeof(string), new StringTrimModelBinder());

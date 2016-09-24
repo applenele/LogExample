@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 
@@ -10,6 +11,19 @@ namespace LogExample.Helper
         private static readonly log4net.ILog LogInfo = log4net.LogManager.GetLogger("LogInfo");
         private static readonly log4net.ILog LogError = log4net.LogManager.GetLogger("LogError");
         private static readonly log4net.ILog LogMonitor = log4net.LogManager.GetLogger("LogTrace");
+
+
+
+        public static void SetConfig()
+        {
+            log4net.Config.XmlConfigurator.Configure();
+        }
+
+        public static void SetConfig(FileInfo configFile)
+        {
+            log4net.Config.XmlConfigurator.Configure(configFile);
+        }
+
 
         /// <summary>
         /// 记录Error日志
