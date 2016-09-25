@@ -14,8 +14,6 @@ namespace LogExample.Controllers
         {
             TraceLog.Operations.Append("增加用户");
             TraceLog.Operations.Append("增加接点");
-
-            TraceLog.Output = "true";
             return View();
         }
 

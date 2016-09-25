@@ -6,6 +6,7 @@ using LogExample.Schemas;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -50,7 +51,8 @@ namespace LogExample.Controllers
             TraceLog.Header = HttpUtility.UrlDecode(filterContext.HttpContext.Request.Headers.ToString());
             TraceLog.Ip = filterContext.HttpContext.Request.GetIpAddr();
             TraceLog.RequestMethod = filterContext.HttpContext.Request.HttpMethod;
-            TraceLog.Input = CollectionHelper.GetCollections(filterContext.HttpContext.Request.Form) + CollectionHelper.GetCollections(filterContext.HttpContext.Request.QueryString); //获取参数
+            TraceLog.Params = CollectionHelper.GetCollections(filterContext.HttpContext.Request.Form) + CollectionHelper.GetCollections(filterContext.HttpContext.Request.QueryString); //获取参数
+ 
             base.OnActionExecuting(filterContext);
         }
 
@@ -61,14 +63,7 @@ namespace LogExample.Controllers
         /// <param name="filterContext"></param>
         protected override void OnActionExecuted(ActionExecutedContext filterContext)
         {
-            //TraceLog monLog = filterContext.Controller.ViewData["TraceLog"] as TraceLog;
-            TraceLog.ExecuteEndTime = DateTime.Now;
-
-            Task.Factory.StartNew(() =>
-            {
-                LoggerHelper.Monitor(TraceLog.GetLogInfo());
-            });
-
+            TraceLog.ActionWatch.Stop();
 
             ///保存操作日志到数据库
             var attrs = filterContext.ActionDescriptor.GetCustomAttributes(true).OfType<RequireLogAttribute>();
@@ -100,11 +95,22 @@ namespace LogExample.Controllers
         #region View 视图生成时间监控 可以记录生成的日志追踪 
         protected override void OnResultExecuting(ResultExecutingContext filterContext)
         {
+
+            TraceLog.VIewWatch = new Stopwatch();
+            TraceLog.VIewWatch.Start();
+
             base.OnResultExecuting(filterContext);
         }
 
         protected override void OnResultExecuted(ResultExecutedContext filterContext)
         {
+            TraceLog.ExecuteEndTime = DateTime.Now;
+            TraceLog.VIewWatch.Stop();
+            Task.Factory.StartNew(() =>
+            {
+                LoggerHelper.Monitor(TraceLog.GetLogInfo());
+            });
+
             base.OnResultExecuted(filterContext);
         }
         #endregion

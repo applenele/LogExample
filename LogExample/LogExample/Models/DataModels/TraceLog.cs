@@ -13,14 +13,19 @@ namespace LogExample.Models.DataModels
     {
         public TraceLog()
         {
-            this.Watch = new Stopwatch();
-            this.Watch.Start();
+            this.ActionWatch = new Stopwatch();
+            this.ActionWatch.Start();
+
+
+
             this.Operations = new StringBuilder();
         }
 
         public string Url { get; set; }
 
-        public Stopwatch Watch { get; set; }
+        public Stopwatch ActionWatch { get; set; }
+
+        public Stopwatch VIewWatch { get; set; }
 
         public DateTime ExecuteStartTime { get; set; }
 
@@ -30,7 +35,6 @@ namespace LogExample.Models.DataModels
 
         public string Header { set; get; }
 
-        public string Response { set; get; }
 
         public StringBuilder Operations { set; get; }
 
@@ -39,17 +43,15 @@ namespace LogExample.Models.DataModels
         /// </summary>
         public string RequestMethod { set; get; }
 
+        /// <summary>
+        /// IP
+        /// </summary>
         public string Ip { set; get; }
 
         /// <summary>
         /// 输入的参数
         /// </summary>
-        public string Input { set; get; }
-
-        /// <summary>
-        /// 返回
-        /// </summary>
-        public string Output { set; get; }
+        public string Params { set; get; }
 
 
         /// <summary>
@@ -57,31 +59,52 @@ namespace LogExample.Models.DataModels
         /// </summary>
         /// <param name="mtype"></param>
         /// <returns></returns>
-        public string GetLogInfo(TraceType mtype = TraceType.Action)
+        public string GetLogInfo(TraceType mtype = TraceType.MVC)
         {
-            this.Watch.Stop();
-            string actionView = "Action执行时间监控：";
-            string action = "Action";
-            if (mtype == TraceType.View)
+            string msgContent = null;
+            if (mtype == TraceType.MVC)
             {
-                actionView = "View视图生成时间监控：";
-                action = "View";
+                string title = "MVC时间监控：";
+                msgContent = string.Format(
+              @"{0},Url:{1},请求方式:{2},开始时间:{3},结束时间:{4},action总时间:{5}毫秒,view总时间:{6},Cookie:{7},Header:{8},Ip:{9}",
+              title,
+              Url,
+              RequestMethod,
+              ExecuteStartTime,
+              ExecuteEndTime,
+              ActionWatch.ElapsedMilliseconds,
+              VIewWatch.ElapsedMilliseconds,
+              this.Cookie, Header, Ip);
+                if (!string.IsNullOrEmpty(this.Operations.ToString()))
+                {
+                    msgContent += @",操作详情：" + this.Operations.ToString();
+                }
+                if (!string.IsNullOrEmpty(Params))
+                {
+                    msgContent += @",输入参数：" + this.Params;
+                }
+
             }
-            string msgContent = string.Format(
-                @"{0},Url:{1},请求方式:{2},开始时间:{3},结束时间:{4},总时间:{5}秒,Cookie:{6},Header:{7},Ip:{8},操作详情:{9},响应:{10}",
-                actionView,
-                Url,
-                RequestMethod,
-                ExecuteStartTime,
-                ExecuteEndTime,
-                Watch.ElapsedMilliseconds, this.Cookie, Header, Ip, Operations.ToString(), Response);
-            if (!string.IsNullOrEmpty(Input))
+            if (mtype == TraceType.Api)
             {
-                msgContent += @",输入参数：" + this.Input;
-            }
-            else if (!string.IsNullOrEmpty(Output))
-            {
-                msgContent += @",输出参数：" + this.Output;
+                var title = "Api时间监控：";
+                msgContent = string.Format(
+                 @"{0},Url:{1},请求方式:{2},开始时间:{3},结束时间:{4},action时间:{5}毫秒,Cookie:{6},Header:{7},Ip:{8}",
+                    title,
+                    Url,
+                    RequestMethod,
+                    ExecuteStartTime,
+                    ExecuteEndTime,
+                    ActionWatch.ElapsedMilliseconds,
+                    this.Cookie, Header, Ip);
+                if (!string.IsNullOrEmpty(this.Operations.ToString()))
+                {
+                    msgContent += @",操作详情：" + this.Operations.ToString();
+                }
+                if (!string.IsNullOrEmpty(Params))
+                {
+                    msgContent += @",输入参数：" + this.Params;
+                }
             }
 
             return msgContent;

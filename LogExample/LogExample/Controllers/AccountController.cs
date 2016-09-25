@@ -27,16 +27,22 @@ namespace LogExample.Controllers
         {
             using (DB db = new DB())
             {
-               
+
                 Password = Password.ToMD5Hash();
                 User user = db.Users.Where(x => x.UserName == UserName && x.Password == Password).FirstOrDefault();
                 if (user != null)
                 {
-                   Session.PutUserIDInSession(EncryptHelper.DESEncode(user.Id.ToString()));
+                    Session.PutUserIDInSession(EncryptHelper.DESEncode(user.Id.ToString()));
                     return Redirect("/Home/Index");
                 }
             }
             return View();
+        }
+
+        [AllowAnonymous]
+        public ActionResult GetJson()
+        {
+            return Json("sss");
         }
     }
 }

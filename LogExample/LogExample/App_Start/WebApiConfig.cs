@@ -17,6 +17,7 @@ using System.Web.Http.Filters;
 using System.Web.Http.Routing;
 using System.Web.Http.Controllers;
 using Newtonsoft.Json.Linq;
+using LogExample.Models.Enum;
 
 namespace LogExample
 {
@@ -91,13 +92,13 @@ namespace LogExample
                 TraceLog.ExecuteStartTime = Convert.ToDateTime(DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.ffff", DateTimeFormatInfo.InvariantInfo));
                 TraceLog.Url = actionContext.Request.RequestUri.AbsoluteUri;
                 TraceLog.Cookie = HttpContext.Current.Request.Cookies.ToDictString();
-                TraceLog.Header = actionContext.Request.Headers.ToString();
+                TraceLog.Header = actionContext.Request.Headers.ToString().Replace("\r\n", "");
                 TraceLog.Ip = actionContext.Request.GetIpAddr();
                 TraceLog.RequestMethod = actionContext.Request.Method.Method;
-                TraceLog.Input = CollectionHelper.GetCollections(HttpContext.Current.Request.Form) + CollectionHelper.GetCollections(HttpContext.Current.Request.Form); //获取参数
+                TraceLog.Params = CollectionHelper.GetCollections(HttpContext.Current.Request.Form) + CollectionHelper.GetCollections(HttpContext.Current.Request.Form); //获取参数
 
-                actionContext.Request.Properties["TraceLog"] = TraceLog;
-
+                // actionContext.Request.Properties["TraceLog"] = TraceLog;
+                HttpContext.Current.Items["TraceLog"] = TraceLog;
                 base.OnActionExecuting(actionContext);
             }
             catch (Exception ex)
@@ -112,15 +113,17 @@ namespace LogExample
         /// <param name="actionExecutedContext"></param>
         public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
         {
-            var TraceLog = actionExecutedContext.Request.Properties["TraceLog"] as TraceLog;
+
+            // var TraceLog = actionExecutedContext.Request.Properties["TraceLog"] as TraceLog;
+            var TraceLog = HttpContext.Current.Items["TraceLog"] as TraceLog;
             if (TraceLog != null)
             {
                 TraceLog.ExecuteEndTime = DateTime.Now;
-                //TraceLog.Response = HttpContext.Current.Response.ToString();
+                TraceLog.ActionWatch.Stop();
 
                 Task.Factory.StartNew(() =>
                 {
-                    LoggerHelper.Monitor(TraceLog.GetLogInfo());
+                    LoggerHelper.Monitor(TraceLog.GetLogInfo(TraceType.Api));
                 });
             }
 

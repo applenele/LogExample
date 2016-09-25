@@ -12,13 +12,13 @@ namespace LogExample.Models.Enum
     public enum TraceType
     {
         /// <summary>
-        /// Action
+        /// MVC
         /// </summary>
-        Action = 1,
+        MVC = 1,
 
         /// <summary>
-        /// 视图
+        /// Api
         /// </summary>
-        View = 2
+        Api = 2
     }
 }
